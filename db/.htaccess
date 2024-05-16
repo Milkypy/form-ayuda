@@ -1,0 +1,11 @@
+#Restringir acceso directorio models
+Options -Indexes
+RewriteEngine On
+
+# Redirige las peticiones directas a carpetas a la página de error 404
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [R=404,L]
+
+# Redirige las peticiones directas a archivos a la página de error 404
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [R=404,L]

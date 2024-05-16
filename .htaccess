@@ -1,0 +1,11 @@
+
+#Options +FollowSymLinks
+Options -Indexes
+RewriteEngine On
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+RewriteCond %{REQUEST_URI} !\.(jpg|jpeg|png)$
+ 
+RewriteRule ^.*$ ./index.php
+#RewriteRule ^.*$ ./index.php [QSA,L]
+
