@@ -106,5 +106,17 @@ class Utils extends Conexion
         return $sectores == [] ? 'No hay sectores' : $sectores;
     }
 
+    //obtener items
+    public function getItems()
+    {
+        $sql = "SELECT item_id, item FROM items WHERE estado=1";
+        $stmt = sqlsrv_query($this->conexion, $sql);
+        $items = array();
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            $items[] = $row;
+        }
+        return $items == [] ? 'No hay items' : $items;
+    }
+
 
 }

@@ -25,16 +25,13 @@ if (!isset($_GET['q']) || empty($_GET['q'])) {
     exit();
 }
 
-
 // Get the query parameter from the URL
-$query = $_GET['q'] ?? null;
+$query = $_GET['q'];
 
 // Get the limit parameter from the URL
 $limit = $_GET['limit'] ?? 20;
 
-// call the getDirecciones method from the solicitud Controller class
 require_once '../controller/ctrl-solicitudes.php';
 $sctrl = new SolicitudCtrl();
 $direcciones = $sctrl->getDirecciones($query, $limit);
 echo json_encode($direcciones);
-exit();

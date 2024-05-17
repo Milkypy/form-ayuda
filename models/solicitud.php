@@ -29,7 +29,7 @@ class Solicitud extends Conexion
         }
         return $solicitud;
     }
-    protected function createSolicitud($data_solicitud): string|array
+    protected function createSolicitud($data_solicitud, $data_items): array
     {
         $sql = "INSERT INTO [dbo].[solicitudes]
                    ([fecha_ingreso]
@@ -51,6 +51,11 @@ class Solicitud extends Conexion
                 VALUES
                      (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ";
+        $sql_items = "INSERT INTO [dbo].[solicitudes_has_items]
+                     ([folio_id]
+                     ,[item_id])
+                    VALUES
+                     (?,?)";
 
         //validar parametros
         $this->validateParams($data_solicitud, $sql);
@@ -72,22 +77,47 @@ class Solicitud extends Conexion
             $data_solicitud['fono'],
             $data_solicitud['mail'],
         );
-        //preparar la consulta
-        $stmnt = sqlsrv_prepare($this->conexion, $sql, $data);
-        if (!$stmnt) {
-            return sqlsrv_errors()[0]['message'] ?? 'Error al crear la solicitud';
+
+        sqlsrv_begin_transaction($this->conexion);
+        //insertar solicitud
+        $stmt1 = sqlsrv_prepare($this->conexion, $sql, $data);
+        if (!$stmt1) {
+            sqlsrv_rollback($this->conexion);
+            sqlsrv_close($this->conexion);
+            return ['success' => false, 'err' => sqlsrv_errors()[0]['message']];
         }
-        //ejecutar la consulta
-        $result = sqlsrv_execute($stmnt);
+        $result = sqlsrv_execute($stmt1);
         if (!$result) {
-            return sqlsrv_errors()[0]['message'] ?? 'Error al crear la solicitud';
+            sqlsrv_rollback($this->conexion);
+            sqlsrv_free_stmt($stmt1);
+            sqlsrv_close($this->conexion);
+            return ['success' => false, 'err' => sqlsrv_errors()[0]['message']];
         }
-        //obtener el folio_id
-        $folio_id = sqlsrv_fetch_array($stmnt, SQLSRV_FETCH_ASSOC);
-        if (!$folio_id) {
-            return sqlsrv_errors()[0]['message'] ?? 'Error al crear la solicitud';
+        //insertar items
+        $folio_id = sqlsrv_fetch_array($stmt1, SQLSRV_FETCH_ASSOC)['folio_id'];
+        foreach ($data_items as $item) {
+            $stmt2 = sqlsrv_prepare($this->conexion, $sql_items, array($folio_id, $item));
+            if (!$stmt2) {
+                sqlsrv_rollback($this->conexion);
+                sqlsrv_free_stmt($stmt1);
+                sqlsrv_close($this->conexion);
+                return ['success' => false, 'err' => sqlsrv_errors()[0]['message']];
+            }
+            $result = sqlsrv_execute($stmt2);
+            if (!$result) {
+                sqlsrv_rollback($this->conexion);
+                sqlsrv_free_stmt($stmt1);
+                sqlsrv_free_stmt($stmt2);
+                sqlsrv_close($this->conexion);
+                return ['success' => false, 'err' => sqlsrv_errors()[0]['message'] ?? 'Error al insertar items'];
+            }
         }
-        return $folio_id;
+        sqlsrv_commit($this->conexion);
+        sqlsrv_free_stmt($stmt1);
+        sqlsrv_free_stmt($stmt2);
+        sqlsrv_close($this->conexion);
+
+        return ['success' => true, 'folio_id' => $folio_id];
     }
     protected function updateSolicitud($id, $nombre, $email, $telefono, $mensaje)
     {
@@ -105,8 +135,10 @@ class Solicitud extends Conexion
     protected function getDireccionesRegistradas(string $param, int $limit): string|array
     {
         //obtiene las direcciones (calle y numero de calle) registradas en tabla solicitudes
-        $sql = "SELECT TOP (?) folio_id, calle, num_calle FROM solicitudes WHERE calle LIKE Concat('%',?,'%') OR num_calle LIKE Concat('%',?,'%') ";
-        
+        $sql = "SELECT TOP (?) folio_id, calle, num_calle, sectores.sector FROM solicitudes
+                inner join sectores on solicitudes.sector = sectores.sector_id
+                WHERE calle LIKE Concat('%',?,'%') OR num_calle LIKE Concat('%',?,'%') ";
+
         $stmt = sqlsrv_query($this->conexion, $sql, array($limit, $param, $param));
         if (!$stmt) {
             return sqlsrv_errors()[0]['message'];
@@ -117,5 +149,45 @@ class Solicitud extends Conexion
             $direcciones[] = $row;
         }
         return $direcciones != null ? $direcciones : 'No hay direcciones registradas';
+    }
+
+    protected function getFullSolicitudes(): string|array
+    {
+        $sql = "SELECT solicitudes.folio_id,
+                        solicitudes.fecha_ingreso, 
+                        solicitudes.last_mod, 
+                        solicitudes.prioridad, 
+                        solicitudes.estado, 
+                        solicitudes.calle, 
+                        solicitudes.num_calle, 
+                        sectores.sector, 
+                        solicitudes.nombre, 
+                        solicitudes.apaterno, 
+                        solicitudes.amaterno, 
+                        solicitudes.rut, 
+                        solicitudes.observaciones, 
+                        solicitudes.fono, 
+                        solicitudes.mail, 
+                        items.item,
+                        solicitudes.creado_por
+                FROM solicitudes
+                INNER JOIN sectores ON solicitudes.sector = sectores.sector_id
+                INNER JOIN solicitudes_has_items ON solicitudes.folio_id = solicitudes_has_items.folio_id
+                INNER JOIN items ON solicitudes_has_items.item_id = items.item_id";
+        $stmt = sqlsrv_query($this->conexion, $sql);
+        if (!$stmt) {
+            return sqlsrv_errors()[0]['message'];
+        }
+        $solicitudes = array();
+        while ($row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC)) {
+            //si la solicitud ya esta en el array, agregar el item
+            if (array_key_exists($row['folio_id'], $solicitudes)) {
+                $solicitudes[$row['folio_id']]['items'][] = $row['item'];
+            } else {
+                $solicitudes[$row['folio_id']] = $row;
+                $solicitudes[$row['folio_id']]['items'] = array($row['item']);
+            }
+        }
+        return $solicitudes != null ? $solicitudes : 'No hay solicitudes';
     }
 }

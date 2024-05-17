@@ -14,48 +14,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'sector' => $_POST['sector'],
         'observaciones' => $_POST['observaciones'],
         'fono' => $_POST['telefono'],
-        'mail' => $_POST['email']
-
+        'mail' => $_POST['email'],
     );
-    $solicitud = $solicitudCtrl->createSolicitudCtrl($data_solicitud);
-
-    if (is_array($solicitud)) {
-        echo '<div class="alert alert-success" role="alert">Solicitud creada con el folio: ' . $solicitud['folio_id'] . '</div>';
-    } else {
-        echo '<div class="alert alert-danger" role="alert">' . $solicitud . '</div>';
-    }
-
+    //obtener items 
+    $items = $_POST['items'];
+    $solicitud = $solicitudCtrl->createSolicitudCtrl($data_solicitud, $items);
+    echo '<script>console.log(' . json_encode($solicitud) . ')</script>';
 }
 
 // otbener sectores
 require_once 'common/utils.php';
 $utils = new Utils();
 $sectores = $utils->getSectores();
-
-
+$items = $utils->getItems();
+$title = 'Formulario Solicitud de Ayuda';
 ?>
 <!DOCTYPE html>
 <html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario Ayuda</title>
-    <link rel="stylesheet" href="public/css/bootstrap.min.css">
-    <link rel="stylesheet" href="public/css/autoComplete.min.css">
-    <script src="public/js/autoComplete.js"></script>
-    <!-- axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<?php require 'views/head.php'; ?>
 
-</head>
+<body style="height:100svh">
 
-<body class="h-100">
-    <main class="container d-flex flex-column justify-content-center flex-lg-row align-items-center gap-5"
-        style="height:100svh">
-        <div>
-            <input type="text" name="direccion" id="direccion">
+    <?php require 'views/nav-bar.php'; ?>
+
+    <main class="container d-flex flex-column flex-lg-row gap-4">
+        <div class="flex-grow-1 d-flex flex-column align-items-top">
+            <h1 class="pb-2">Buscar Dirección</h1>
+            <p>Busca una dirección almacenada en los registros de solicitudes para corroborar si la dirección a
+                ingresar
+                ya se le ha asignado una ayuda</p>
+            <input type="text" name="direccion" class="form-control" id="direccion" style="width: 100% !important;">
         </div>
-        <form action="" method="post" class="px-3">
+        <form action="" method="post" class="" style="max-width:45em;">
             <h1 class="pb-2">Formulario Solicitud de Ayuda</h1>
             <div class="row">
 
@@ -69,6 +60,42 @@ $sectores = $utils->getSectores();
                 <div class="form-group col-lg-6 col-12">
                     <label for="num_calle">Número</label>
                     <input type="text" class="form-control" id="num_calle" name="num_calle" required>
+                </div>
+
+            </div>
+            <div class="row mb-3">
+
+                <!-- sector -->
+                <div class="form-group col-lg-6 col-12">
+                    <label for="sector">Sector</label>
+                    <select name="sector" class="form-select" id="sector">
+                        <?php foreach ($sectores as $sector): ?>
+                            <option value="<?php echo $sector['sector_id'] ?>"><?php echo $sector['sector'] ?></option>
+                        <?php endforeach; ?>
+
+                    </select>
+                </div>
+
+                <!-- prioridad -->
+                <div class="form-group col-lg-6 col-12">
+                    <label for="prioridad">Prioridad</label>
+                    <select name="prioridad" class="form-select" id="prioridad">
+                        <option value="1">Común</option>
+                        <option value="2">Adultos mayores / Menores de edad</option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex flex-lg-row flex-column gap-3 align-items-center">
+
+                <h6 class="flex-grow-1">📄 Items requeridos</h6>
+                <div class="d-flex flex-wrap gap-3 group">
+                    <?php foreach ($items as $item): ?>
+                        <input class="btn-check" type="checkbox" value="<?php echo $item['item_id'] ?>"
+                            id="<?php echo $item['item'] ?>" name="items[]">
+                        <label class="btn btn-outline-secondary text-nowrap" for="<?php echo $item['item'] ?>">
+                            <?php echo $item['item'] ?>
+                        </label>
+                    <?php endforeach; ?>
                 </div>
 
             </div>
@@ -110,27 +137,6 @@ $sectores = $utils->getSectores();
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
 
-
-                <!-- sector -->
-                <div class="form-group col-lg-6 col-12">
-                    <label for="sector">Sector</label>
-                    <select name="sector" class="form-select" id="sector">
-                        <?php foreach ($sectores as $sector): ?>
-                            <option value="<?php echo $sector['sector_id'] ?>"><?php echo $sector['sector'] ?></option>
-                        <?php endforeach; ?>
-
-                    </select>
-                </div>
-
-                <!-- prioridad -->
-                <div class="form-group col-lg-6 col-12">
-                    <label for="prioridad">Prioridad</label>
-                    <select name="prioridad" class="form-select" id="prioridad">
-                        <option value="1">Común</option>
-                        <option value="2">Adultos mayores / Menores de edad</option>
-                    </select>
-                </div>
-
             </div>
             <hr>
             <!-- observaciones -->
@@ -138,80 +144,50 @@ $sectores = $utils->getSectores();
                 <label for="observaciones">Observaciones</label>
                 <textarea name="observaciones" id="observaciones" class="form-control" rows="3"></textarea>
             </div>
-            <div>
+            <div class="d-flex align-items-center justify-content-between">
                 <button type="submit" class="btn btn-success btn-lg">Enviar</button>
+                <!--loader-->
+                <div class="spinner-border text-success d-none" role="status" id="loader">
+                    <span class="visually-hidden">Enviando, por favor espere...</span>
+                </div>
             </div>
 
 
         </form>
     </main>
+
+    <?php require 'toast.php'; ?>
+    <?php require 'modal-logout.php'; ?>
+
+
+    <script src="public/js/bootstrap.bundle.min.js"></script>
+    <script src="public/js/buscar-direccion.js"></script>
+    <script src="public/js/toast.js"></script>
+
+    <?php if (isset($solicitud)) {
+        if (is_array($solicitud) && array_key_exists('success', $solicitud) && $solicitud['success']) {
+            echo '<script>showToast("Solicitud Folio N°' . $solicitud['folio_id'] . ' creada con éxito","success")</script>';
+        } else if (is_array($solicitud) && array_key_exists('success', $solicitud) && !$solicitud['success']) {
+            echo '<script>showToast("Error al crear solicitud")</script>';
+        } else {
+            echo '<script>showToast("' . $solicitud . '")</script>';
+        }
+    }
+    ?>
+
     <script>
-
-        const autoCompletejs = new autoComplete({
-            selector: '#direccion',
-            placeHolder: 'Buscar direcciones registradas en solicitudes...',
-            msgNoResults: 'No se encontraron resultados',
-            maxResults: 20,
-            data: {
-                src: async () => {
-                    const query = document.querySelector('#direccion').value;
-                    const source = await axios.get('api/api-direccion.php', {
-                        params: {
-                            q: query,
-                            limit: 20
-                        }
-                    }).then(res => {
-                        // console.log(res.data);
-                        if (typeof res.data === 'string') return [res.data];
-                        arr = res.data.map(item => `Folio ${item.folio_id} - ${item.calle} - #${item.num_calle}`);
-                        // console.log(arr);
-                        return arr;
-                    }).catch(err => {
-                        console.error(err);
-                        return [];
-                    });
-                    //si source es solo un string, retornar un array con ese string
-                    if (typeof source === 'string') {
-                        return Array[source];
-                    }
-                    return source;
-                },
-                cache: false
-            },
-
-            resultsList: {
-                element: (list, data) => {
-                    if (!data.results.length) {
-                        // Create "No Results" message element
-                        const message = document.createElement("div");
-                        // Add class to the created element
-                        message.setAttribute("class", "no_result");
-                        message.style.padding = "10px";
-                        message.style.border = "1px solid #ccc";
-                        message.style.backgroundColor = "#fff";
-                        message.style.borderRadius = "5px";
-                        // Add message text content
-                        message.innerHTML = `<span> ✅ No se encontraron registros para: "${data.query}"</span>`;
-                        // Append message element to the results list
-                        list.prepend(message);
-                    }
-                },
-                noResults: true,
-            },
-            resultItem: {
-                element: (item, data) => {
-                    // Modify Results Item Style
-                    item.style = "display: flex; justify-content: space-between;";
-                    // Modify Results Item Content
-                    item.innerHTML = `<span style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">
-                    ${data.value}</span>`;
-                },
-                highlight: true
-            },
+        const form = document.querySelector('form');
+        form.addEventListener('submit', () => {
+            document.querySelector('#loader').classList.remove('d-none');
+            document.querySelector('button[type="submit"]').disabled = true;
         });
-    </script>
 
-    <script src="public/js/bootstrap.min.js"></script>
+        // Verificar si el formulario se ha enviado
+        if (window.history.replaceState) {
+            // Reemplazar la URL actual en el historial del navegador
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
 
 </body>
 

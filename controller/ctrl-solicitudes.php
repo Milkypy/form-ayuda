@@ -17,11 +17,11 @@ class SolicitudCtrl extends Solicitud
         return $solicitud;
     }
 
-    public function createSolicitudCtrl(array $data_solicitud = array()): string|array
+    public function createSolicitudCtrl(array $data_solicitud = array(), array $selected_items = null): string|array
     {
         //limpiar los datos
         $data_solicitud = array_map(array($this, 'protect_text'), $data_solicitud);
-
+        $data_items = array_map(array($this, 'protect_text'), $selected_items);
         //agrega fecha_ingreso, creado_por, estado y last_mod
         $data_solicitud['fecha_ingreso'] = new DateTime('now');
         $data_solicitud['last_mod'] = new DateTime('now');
@@ -31,8 +31,14 @@ class SolicitudCtrl extends Solicitud
         if (!$data_solicitud || empty($data_solicitud)) {
             return 'No hay datos para crear la solicitud';
         }
-        $result = $this->createSolicitud($data_solicitud);
+        $result = $this->createSolicitud($data_solicitud, $data_items);
         return $result;
+    }
+
+    public function getFullSolicitudesCtrl()
+    {
+        $solicitudes = $this->getFullSolicitudes();
+        return $solicitudes;
     }
 
 

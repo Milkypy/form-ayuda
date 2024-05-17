@@ -10,6 +10,9 @@ echo $_SERVER['PHP_SELF'] .'<br>'; */
 
 $routes = [
     '/' => 'views/form-ayuda.php',
+    '/logout' => 'common/logout.php',
+    '/login' => 'views/login.php',
+    '/dashboard' => 'views/dashboard.php',
     '/solicitudes' => 'views/solicitudes.php',
     '/stats' => 'views/stats.php',
     '/404' => 'views/404.php',
