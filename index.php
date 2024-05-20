@@ -16,6 +16,8 @@ $routes = [
     '/solicitudes' => 'views/solicitudes.php',
     '/stats' => 'views/stats.php',
     '/404' => 'views/404.php',
+    '/admin-users' => 'views/admin-users.php',
+    '/excel' => 'common/excel.php',
 ];
 
 if (array_key_exists($uri, $routes)) {

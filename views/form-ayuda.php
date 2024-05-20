@@ -37,7 +37,6 @@ $title = 'Formulario Solicitud de Ayuda';
 <body style="height:100svh">
 
     <?php require 'views/nav-bar.php'; ?>
-
     <main class="container d-flex flex-column flex-lg-row gap-4">
         <div class="flex-grow-1 d-flex flex-column align-items-top">
             <h1 class="pb-2">Buscar Dirección</h1>

@@ -17,11 +17,14 @@ $title = 'Dashboard | Solicitudes de Ayuda';
 
     <?php require 'nav-bar.php'; ?>
     <main class="p-3 d-flex flex-column">
-        <div class="d-flex flex-column gap-4">
-            <h3>Solicitudes de Ayuda</h3>
+        <div class="d-flex flex-column flex-lg-row  gap-4">
+            <h3 class="flex-grow-1">Solicitudes de Ayuda</h3>
+            <div class="">
+                <a href="/excel" class="btn btn-success">Descargar Excel</a>
+            </div>
         </div>
-        <div class="rounded">
-            <table class="table text-center table-sm rounded table-bordered " style="font-size: smaller;">
+        <div class="rounded overflow-auto">
+            <table class="table text-center table-sm rounded table-bordered table-striped " style="font-size: smaller;">
                 <thead class="align-top">
                     <tr>
                         <th scope="col">Folio</th>
@@ -40,19 +43,26 @@ $title = 'Dashboard | Solicitudes de Ayuda';
                         <th scope="col">Observaciones</th>
                         <th scope="col">Fono</th>
                         <th scope="col">Mail</th>
+                        <th scope="col">Estado</th>
                     </tr>
                 </thead>
                 <tbody class="align-middle">
                     <?php
                     if (is_array($solicitudes)) {
                         foreach ($solicitudes as $solicitud) {
-                            echo $solicitud['estado'] == 0 ? '<tr class="table-success">' : '<tr class="table-warning">';
+                            echo '<tr class="tex-center">';
                             echo '<td>' . $solicitud['folio_id'] . '</td>';
                             echo '<td>' . date('y-m-d H:i\h\r\s', strtotime($solicitud['fecha_ingreso'])) . '</td>';
                             echo '<td>' . $solicitud['sector'] . '</td>';
                             echo '<td>' . ($solicitud['prioridad'] == 1 ? 'Común' : 'Menores de Edad/Adulto Mayor') . '</td>';
-                            // obtiene los items de la solicitud
+                            //estiliza el estado de la solicitud
+                            if ($solicitud['estado'] == 0) {
+                                echo '<td><span class="badge bg-secondary">Recibida</span></td>';
+                            } else {
+                                echo '<td><span class="badge bg-success">Entregada</span></td>';
+                            }
                             echo '<td>';
+                            // obtiene los items de la solicitud
                             foreach ($solicitud['items'] as $item) {
                                 echo '<span class="badge bg-dark">' . $item . '</span> <br>';
                             }
@@ -80,12 +90,27 @@ $title = 'Dashboard | Solicitudes de Ayuda';
 
         <script>
             new DataTable(".table", {
-                searchable: true,
-                withUI: true,
+                // searchable: true,
                 fixedHeight: true,
                 sortable: true,
                 fixedHeader: true,
                 pagination: true,
+                language: {
+                    search: "Buscar:",
+                    searchPlaceholder: "Buscar...",
+                    paginate: {
+                        first: "Primero",
+                        last: "Último",
+                        next: "Siguiente",
+                        previous: "Anterior",
+                    },
+                    lengthMenu: "Mostrar _MENU_ registros",
+                    loadingRecords: "Cargando...",
+                    zeroRecords: "No se encontraron registros",
+                    emptyTable: "No hay registros",
+                    entriesPerPage: "Mostrando _MENU_ registros por página",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                },
                 labels: {
                     placeholder: "Buscar...",
                     perPage: "{select} registros por página",
@@ -117,6 +142,7 @@ $title = 'Dashboard | Solicitudes de Ayuda';
                     { data: "observaciones", title: "Observaciones" },
                     { data: "fono", title: "Teléfono" },
                     { data: "mail", title: "Correo Electrónico" },
+                    { data: "estado", title: "Estado" },
                 ],
             });
 

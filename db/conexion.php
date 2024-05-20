@@ -47,6 +47,9 @@ class Conexion
             throw new Exception("Invalid number of parameters. Expected $expectedCount, got $actualCount.");
         }
     }
+    public function getConexion()
+    {
+        return $this->conexion;
+    }
 
 }
-$conexion = new Conexion();
