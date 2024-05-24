@@ -4,7 +4,6 @@
 require_once __DIR__ . '/../controller/ctrl-user.php';
 $usuarioCtrl = new UserCtrl();
 
-
 //crear usuario via post
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && !empty($_POST['action'])) {
     switch ($_POST['action']) {
@@ -33,6 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && !empty($_
             $user = $_POST['id'];
             $toast = $usuarioCtrl->deleteUserCtrl($user);
             break;
+        default:
+            $toast = array('success' => false, 'message' => 'Acción no válida');
+            break;
     }
 }
 
@@ -42,8 +44,8 @@ $usuarios = $usuarioCtrl->getUsersCtrl();
 <!DOCTYPE html>
 <html lang="es">
 
-<?php require 'views/head.php'; ?>
-<?php require 'views/nav-bar.php'; ?>
+<?php require 'views/templates/head.php'; ?>
+<?php require 'views/templates/nav-bar.php'; ?>
 
 <body>
     <main class="container">
@@ -51,56 +53,59 @@ $usuarios = $usuarioCtrl->getUsersCtrl();
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-nuevo-usuario">
             Agregar usuario
         </button>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>Id</th>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Usuario</th>
-                    <th>Rol</th>
-                    <th>Estado</th>
-                    <th>Fecha creado</th>
-                    <th>Última modificación</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (isset($usuarios['error'])) {
-                    echo "<tr><td colspan='5'>" . $usuarios['error'] . "</td></tr>";
-                } else {
-                    foreach ($usuarios as $usuario):
-                        ?>
-                        <tr>
-                            <td>
-                                <button class="btn btn-sm"
-                                    data-user="<?= htmlspecialchars(json_encode($usuario, JSON_UNESCAPED_UNICODE)) ?>"
-                                    onclick="showEditModal(this)">🖊️</button>
-                                <button class="btn btn-sm" data-id-user="<?= $usuario['user_id'] ?>"
-                                    data-name="<?= $usuario['nombre'] ?>" onclick="showDeleteModal(this)">✖️</button>
-                            </td>
-                            <td><?= $usuario['user_id'] ?></td>
-                            <td><?= $usuario['nombre'] ?></td>
-                            <td><?= $usuario['email'] ?></td>
-                            <td><?= $usuario['usuario'] ?></td>
-                            <td><?= $usuario['rol'] == 1 ? 'Administrador' : 'Usuario' ?></td>
-                            <td><?= $usuario['estado'] == 1 ? 'Activo' : 'Inactivo' ?></td>
-                            <td><?= date_format(new DateTime($usuario['fecha_creado']), 'Y-m-d H:i') ?></td>
-                            <td><?= date_format(new DateTime($usuario['last_mod']), 'Y-m-d H:i') ?></td>
+        <div class="overflow-auto table-responsive">
+            <table class="table table-hover table-light table-striped  ">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Correo</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha creado</th>
+                        <th>Última modificación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (isset($usuarios['error'])) {
+                        echo "<tr><td colspan='5'>" . $usuarios['error'] . "</td></tr>";
+                    } else {
+                        foreach ($usuarios as $usuario):
+                            ?>
+                            <tr>
+                                <td>
+                                    <button class="btn"
+                                        data-user="<?= htmlspecialchars(json_encode($usuario, JSON_UNESCAPED_UNICODE)) ?>"
+                                        onclick="showEditModal(this)"><i class="bi bi-pencil-square"></i></button>
+                                    <button class="btn" data-id-user="<?= $usuario['user_id'] ?>"
+                                        data-name="<?= $usuario['nombre'] ?>" onclick="showDeleteModal(this)"><i
+                                            class="bi bi-trash"></i></button>
+                                </td>
+                                <td><?= $usuario['user_id'] ?></td>
+                                <td><?= $usuario['nombre'] ?></td>
+                                <td><?= $usuario['email'] ?></td>
+                                <td><?= $usuario['usuario'] ?></td>
+                                <td><?= $usuario['rol'] == 1 ? 'Administrador' : 'Usuario' ?></td>
+                                <td><?= $usuario['estado'] == 1 ? 'Activo' : 'Inactivo' ?></td>
+                                <td><?= date_format(new DateTime($usuario['fecha_creado']), 'Y-m-d H:i') ?></td>
+                                <td><?= date_format(new DateTime($usuario['last_mod']), 'Y-m-d H:i') ?></td>
 
-                            <?php
-                    endforeach;
-                }
-                ?>
-            </tbody>
-        </table>
+                                <?php
+                        endforeach;
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
 
     </main>
-    <?php require 'views/toast.php'; ?>
-    <?php require 'views/modal-user.php'; ?>
-    <?php require 'views/modal-logout.php'; ?>
-
+    <?php require 'views/templates/toast.php'; ?>
+    <?php require 'views/modals/modal-user.php'; ?>
+    <?php require 'views/modals/modal-logout.php'; ?>
+    <?php require 'views/templates/footer.php'; ?>
 
     <script src="public/js/bootstrap.bundle.min.js"></script>
     <script src="public/js/toast.js"></script>
@@ -140,6 +145,32 @@ $usuarios = $usuarioCtrl->getUsersCtrl();
             form.querySelector('#nombre-eliminar').textContent = name;
             let modal = new bootstrap.Modal(document.getElementById('modal-eliminar-usuario'));
             modal.show();
+        }
+
+        function setPassword(input) {
+            //generar contraseña aleatoria alfanumérica
+            const allowedChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let pass = '';
+            for (let i = 0; i < 8; i++) {
+                pass += allowedChars.charAt(Math.floor(Math.random() * allowedChars.length));
+            }
+            document.getElementById(input).value = pass;
+        }
+
+        function cleanPassword(input) {
+            document.getElementById(input).value = '';
+        }
+
+        window.onload = function () {
+            $('.table').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+                },
+                initComplete: function () {
+                    //aplicar estilos a la tabla
+                    $('.table').addClass('w-100');
+                }
+            });
         }
     </script>
 </body>

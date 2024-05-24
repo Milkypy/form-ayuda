@@ -1,3 +1,16 @@
+<?php
+//array de rutas y links para navbar
+$nav_links = array(
+    'Formulario' => '/',
+    'Dashboard' => '/dashboard',
+    'Items' => '/items',
+    'Estadísticas' => '/estadisticas',
+    'Usuarios' => '/usuarios',
+);
+//indica el link activo
+$active_link = $_SERVER['REQUEST_URI'];
+
+?>
 <nav class="navbar navbar-expand-lg navbar-dark mb-3" style="background-color: #08143d;">
     <div class="container py-3">
         <a class="navbar-brand" href="#">
@@ -9,26 +22,15 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/">Formulario</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/dashboard">Dashboard</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Dropdown
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Items</a></li>
-                        <li><a class="dropdown-item" href="#">Estadísticas</a></li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
-                    </ul>
-                </li>
+                <?php
+                foreach ($nav_links as $key => $value) {
+                    $active = ($active_link == $value) ? 'active' : '';
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link ' . $active . '" href="' . $value . '">' . $key . '</a>';
+                    echo '</li>';
+                }
+                ?>
+
                 <li class="nav-item">
                     <a class="nav-link" data-bs-toggle="modal" data-bs-target="#modal-logout">
                         <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"

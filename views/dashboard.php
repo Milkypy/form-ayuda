@@ -11,11 +11,11 @@ $title = 'Dashboard | Solicitudes de Ayuda';
 <!DOCTYPE html>
 <html lang="es">
 
-<?php require 'head.php'; ?>
+<?php require 'templates/head.php'; ?>
 
 <body>
 
-    <?php require 'nav-bar.php'; ?>
+    <?php require 'templates/nav-bar.php'; ?>
     <main class="p-3 d-flex flex-column">
         <div class="d-flex flex-column flex-lg-row  gap-4">
             <h3 class="flex-grow-1">Solicitudes de Ayuda</h3>
@@ -52,7 +52,7 @@ $title = 'Dashboard | Solicitudes de Ayuda';
                         foreach ($solicitudes as $solicitud) {
                             echo '<tr class="tex-center">';
                             echo '<td>' . $solicitud['folio_id'] . '</td>';
-                            echo '<td>' . date('y-m-d H:i\h\r\s', strtotime($solicitud['fecha_ingreso'])) . '</td>';
+                            echo '<td>' . date('d-m-y H:i\h\r\s', strtotime($solicitud['fecha_ingreso'])) . '</td>';
                             echo '<td>' . $solicitud['sector'] . '</td>';
                             echo '<td>' . ($solicitud['prioridad'] == 1 ? 'Común' : 'Menores de Edad/Adulto Mayor') . '</td>';
                             //estiliza el estado de la solicitud
@@ -89,68 +89,24 @@ $title = 'Dashboard | Solicitudes de Ayuda';
         </div>
 
         <script>
-            new DataTable(".table", {
-                // searchable: true,
-                fixedHeight: true,
-                sortable: true,
-                fixedHeader: true,
-                pagination: true,
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Buscar...",
-                    paginate: {
-                        first: "Primero",
-                        last: "Último",
-                        next: "Siguiente",
-                        previous: "Anterior",
+            window.onload = function () {
+                $('.table').DataTable({
+                    "language": {
+                        "url": "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
                     },
-                    lengthMenu: "Mostrar _MENU_ registros",
-                    loadingRecords: "Cargando...",
-                    zeroRecords: "No se encontraron registros",
-                    emptyTable: "No hay registros",
-                    entriesPerPage: "Mostrando _MENU_ registros por página",
-                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-                },
-                labels: {
-                    placeholder: "Buscar...",
-                    perPage: "{select} registros por página",
-                    noRows: "No se encontraron registros",
-                    info: "Mostrando {start} a {end} de {rows} registros",
-                },
-                // ajax: {
-                //     url: "api/api-solicitudes.php",
-                //     method: "GET",
-                //     data: {
-                //         action: "getFullSolicitudes",
-                //     },
-                //     dataSrc: "data",
-                // },
-                columns: [
-                    { data: "folio_id", title: "ID de Folio" },
-                    { data: "fecha_ingreso", title: "Fecha de Ingreso" },
-                    { data: "sector", title: "Sector" },
-                    { data: "prioridad", title: "Prioridad" },
-                    { data: "items", title: "Items" },
-                    { data: "last_mod", title: "Última Modificación" },
-                    { data: "creado_por", title: "Creado Por" },
-                    { data: "calle", title: "Calle" },
-                    { data: "num_calle", title: "Número de Calle" },
-                    { data: "nombre", title: "Nombre" },
-                    { data: "apaterno", title: "Apellido Paterno" },
-                    { data: "amaterno", title: "Apellido Materno" },
-                    { data: "rut", title: "RUT" },
-                    { data: "observaciones", title: "Observaciones" },
-                    { data: "fono", title: "Teléfono" },
-                    { data: "mail", title: "Correo Electrónico" },
-                    { data: "estado", title: "Estado" },
-                ],
-            });
-
+                    initComplete: function () {
+                        //aplicar estilos a la tabla
+                        $('.table').addClass('w-100');
+                    }
+                });
+            }
         </script>
     </main>
 
-    <?php require 'modal-logout.php'; ?>
-    <?php require 'toast.php'; ?>
+    <?php require 'modals/modal-logout.php'; ?>
+    <?php require 'templates/toast.php'; ?>
+    <?php require 'views/templates/footer.php'; ?>
+
 
     <script src="public/js/bootstrap.bundle.min.js"></script>
     <script src="public/js/toast.js"></script>

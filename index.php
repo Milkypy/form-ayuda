@@ -14,10 +14,11 @@ $routes = [
     '/login' => 'views/login.php',
     '/dashboard' => 'views/dashboard.php',
     '/solicitudes' => 'views/solicitudes.php',
-    '/stats' => 'views/stats.php',
+    '/estadisticas' => 'views/stats.php',
     '/404' => 'views/404.php',
-    '/admin-users' => 'views/admin-users.php',
+    '/usuarios' => 'views/admin-users.php',
     '/excel' => 'common/excel.php',
+    '/rutas' => 'views/rutas.php',
 ];
 
 if (array_key_exists($uri, $routes)) {

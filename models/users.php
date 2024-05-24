@@ -82,7 +82,7 @@ class User extends Conexion
                 'error' => sqlsrv_errors()[0]['message'] ?? 'Error al crear el usuario',
             );
         }
-        sqlsrv_free_stmt($stmt);
+        // sqlsrv_free_stmt($stmt);
         sqlsrv_close($this->getConexion());
         return array(
             'success' => true,
@@ -114,7 +114,6 @@ class User extends Conexion
         );
         $stmt = sqlsrv_query($this->getConexion(), $sql, $params);
         if (!$stmt) {
-            sqlsrv_free_stmt($stmt);
             return array(
                 'success' => false,
                 'error' => sqlsrv_errors()[0]['message'] ?? 'Error al actualizar el usuario',

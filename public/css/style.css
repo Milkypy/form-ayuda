@@ -1,0 +1,46 @@
+/** style all sidebars **/
+* ::-webkit-scrollbar {
+  width: 0.5em;
+}
+* ::-webkit-scrollbar-thumb {
+  background-color: #2f55d4;
+  border-radius: 10px;
+}
+* ::-webkit-scrollbar-track {
+  background: #cfe2ff;
+  border-radius: 10px;
+}
+
+body {
+  height: 100svh;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/***********************   FOOTER   ***********************************/
+footer {
+  font-size: smaller;
+  color: #cacaca;
+  text-align: center;
+}
+footer section {
+  display: flex;
+  flex-direction: row;
+  column-gap: 0.5em;
+  align-items: center;
+  text-align: left;
+  justify-content: center;
+}
+footer section img {
+  width: auto;
+  height: 5em;
+  opacity: 75%;
+}
+footer section .divLineFooter {
+  border-left: 1px solid #cacaca;
+  padding-left: 1em;
+  height: auto;
+  display: flex;
+  justify-content: center;
+}

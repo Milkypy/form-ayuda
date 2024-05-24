@@ -5,7 +5,7 @@ const autoCompletejs = new autoComplete({
     wrapInput: true,
     searchEngine: "loose",
     highlight: true,
-    debounce: 300,
+    debounce: 200,
     threshold: 3,
     // wrapper: false,
     data: {
@@ -56,16 +56,5 @@ const autoCompletejs = new autoComplete({
         },
         noResults: true,
         maxResults: 20,
-    },
-    // resultItem: {
-    //     element: (item, data) => {
-    //         // Modify Results Item Style
-    //         // item.style = "display: flex; justify-content: space-between;";
-    //         // Modify Results Item Content
-    //         // item.innerHTML = `<span style="text-overflow: ellipsis; white-space: nowrap;">
-    //         // ${data.value}</span>`;
-    //     },
-    //     highlight: true,
-
-    // },
+    }
 });
