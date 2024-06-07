@@ -2,10 +2,10 @@
 //array de rutas y links para navbar
 $nav_links = array(
     'Formulario' => '/',
-    'Dashboard' => '/dashboard',
-    'Items' => '/items',
-    'Estadísticas' => '/estadisticas',
-    'Usuarios' => '/usuarios',
+    'Dashboard' => '/dashboard'
+    // 'Items' => '/items',
+    // 'Estadísticas' => '/estadisticas',
+    // 'Usuarios' => '/usuarios',
 );
 //indica el link activo
 $active_link = $_SERVER['REQUEST_URI'];

@@ -135,9 +135,26 @@ class Solicitud extends Conexion
     protected function getDireccionesRegistradas(string $param, int $limit): string|array
     {
         //obtiene las direcciones (calle y numero de calle) registradas en tabla solicitudes
-        $sql = "SELECT TOP (?) folio_id, calle, num_calle, sectores.sector FROM solicitudes
+        $sql = "SELECT TOP (?) [folio_id]
+                ,[fecha_ingreso]
+                ,[last_mod]
+                ,[prioridad]
+                ,[estado]
+                ,[creado_por]
+                ,[calle]
+                ,[num_calle]
+                ,[nombre]
+                ,[apaterno]
+                ,[amaterno]
+                ,[rut]
+                ,[ruta]
+                ,[mail]
+                ,[fono]
+                ,[observaciones]
+                ,sectores.sector
+                FROM solicitudes
                 inner join sectores on solicitudes.sector = sectores.sector_id
-                WHERE calle LIKE Concat('%',?,'%') OR num_calle LIKE Concat('%',?,'%') ";
+                WHERE calle LIKE Concat('%',?,'%') OR num_calle LIKE Concat('%',?,'%')";
 
         $stmt = sqlsrv_query($this->conexion, $sql, array($limit, $param, $param));
         if (!$stmt) {

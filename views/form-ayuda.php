@@ -36,7 +36,7 @@ $title = 'Formulario Solicitud de Ayuda';
 
 <body>
     <?php require 'templates/nav-bar.php'; ?>
-    <main class="container d-flex flex-column " style="height: 75%;">
+    <main class="container d-flex flex-column ">
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -47,13 +47,14 @@ $title = 'Formulario Solicitud de Ayuda';
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="form-tab" data-bs-toggle="tab" data-bs-target="#form-tab-pane"
-                    type="button" role="tab" aria-controls="form-tab-pane" aria-selected="false">Ingresar Solicitud</button>
+                    type="button" role="tab" aria-controls="form-tab-pane" aria-selected="false">Ingresar
+                    Solicitud</button>
             </li>
         </ul>
 
-        <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active border border-top-0 p-3 shadow" id="busca-direccion-tab-pan" role="tabpanel"
-                aria-labelledby="home-tab" tabindex="0">
+        <div class="tab-content" id="myTabContent" style="height: 40em;">
+            <div class="tab-pane fade show active border border-top-0 p-3 shadow" id="busca-direccion-tab-pan"
+                role="tabpanel" aria-labelledby="home-tab" tabindex="0">
                 <!-- Buscar dirección -->
                 <div class="flex-grow-1 d-flex flex-column align-items-top">
                     <h1 class="pb-2">Buscar Dirección</h1>
@@ -65,10 +66,11 @@ $title = 'Formulario Solicitud de Ayuda';
                 </div>
             </div>
 
-            <div class="tab-pane fade border border-top-0 p-3 shadow" id="form-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+            <div class="tab-pane fade border border-top-0 p-3 shadow" id="form-tab-pane" role="tabpanel"
+                aria-labelledby="profile-tab" tabindex="0">
                 <!-- Formulario de solicitud de ayuda -->
                 <form action="" method="post" class="" style="max-width:45em;">
-                    <h1 class="pb-2">Formulario Solicitud de Ayuda</h1>
+                    <h1 class="pb-2">Formulario Solicitud de Emergencia</h1>
                     <div class="row">
 
                         <!-- direccion -->
@@ -183,10 +185,11 @@ $title = 'Formulario Solicitud de Ayuda';
 
 
     </main>
+    <?php require 'views/templates/footer.php'; ?>
 
     <?php require 'templates/toast.php'; ?>
     <?php require 'modals/modal-logout.php'; ?>
-    <?php require 'views/templates/footer.php'; ?>
+    <?php require 'modals/modal-info.php'; ?>
 
 
 

@@ -18,19 +18,17 @@ $title = 'Dashboard | Solicitudes de Ayuda';
     <?php require 'templates/nav-bar.php'; ?>
     <main class="p-3 d-flex flex-column">
         <div class="d-flex flex-column flex-lg-row  gap-4">
-            <h3 class="flex-grow-1">Solicitudes de Ayuda</h3>
-            <div class="">
-                <a href="/excel" class="btn btn-success">Descargar Excel</a>
-            </div>
+            <h3 class="flex-grow-1">Solicitudes de Emergencia</h3>
         </div>
         <div class="rounded overflow-auto">
-            <table class="table text-center table-sm rounded table-bordered table-striped " style="font-size: smaller;">
+            <table class="table text-center table-sm rounded table-bordered table-striped w-100 " style="font-size: smaller;">
                 <thead class="align-top">
                     <tr>
                         <th scope="col">Folio</th>
                         <th scope="col">Fecha Ingreso</th>
                         <th scope="col">Sector</th>
                         <th scope="col">Prioridad</th>
+                        <th scope="col">Estado</th>
                         <th scope="col">Items</th>
                         <th scope="col">Última Modificación</th>
                         <th scope="col">Creado por</th>
@@ -43,7 +41,6 @@ $title = 'Dashboard | Solicitudes de Ayuda';
                         <th scope="col">Observaciones</th>
                         <th scope="col">Fono</th>
                         <th scope="col">Mail</th>
-                        <th scope="col">Estado</th>
                     </tr>
                 </thead>
                 <tbody class="align-middle">
@@ -94,9 +91,64 @@ $title = 'Dashboard | Solicitudes de Ayuda';
                     "language": {
                         "url": "https://cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
                     },
-                    initComplete: function () {
-                        //aplicar estilos a la tabla
-                        $('.table').addClass('w-100');
+                    layout: {
+                        topEnd: {
+                            buttons:
+                                [
+                                    {
+                                        extend: 'excel',
+                                        text: function (dt) {
+                                            return '<i class="bi bi-file-earmark-spreadsheet"></i> Excel';
+                                        },
+                                        className: 'btn btn-sm btn-success',
+                                        filename: 'Registro de Solicitudes - ' + moment().format('DD-MM-YYYY HH:mm:ss'),
+                                        title: function (dt) {
+                                            return 'Registro de solicitudes';
+                                        },
+                                        messageBottom: function (dt) {
+                                            const fecha = moment().format('dddd, D [de] MMMM, YYYY. [a las] HH:mm[hrs]');
+                                            return 'Reporte generado: ' + fecha;
+                                        },
+                                    },
+                                    {
+                                        extend: 'pdf',
+                                        text: function (dt) {
+                                            return '<i class="bi bi-file-earmark-pdf"></i> PDF';
+                                        },
+                                        className: 'btn btn-sm btn-danger',
+                                        filename: 'Registro de Solicitudes - ' + moment().format('DD-MM-YYYY HH:mm:ss'),
+                                        orientation: 'landscape',
+                                        title: function (dt) {
+                                            return 'Registro de Solicitudes ';
+                                        },
+                                        messageTop: function (dt) {
+                                            const fecha = moment().format('dddd, D [de] MMMM, YYYY. [a las] HH:mm[hrs]');
+                                            return 'Reporte generado: ' + fecha;
+                                        },
+                                    },
+                                    //print
+                                    {
+                                        extend: 'print',
+                                        text: function (dt) {
+                                            return '<i class="bi bi-printer"></i> Imprimir';
+                                        },
+                                        className: 'btn btn-sm btn-primary',
+                                        orientation: 'landscape',
+                                        title: function (dt) {
+                                            return 'Registro de Solicitudes'
+                                        },
+                                        messageBottom: function (dt) {
+                                            const fecha = moment().format('dddd, D [de] MMMM, YYYY. [a las] HH:mm[hrs]');
+                                            return 'Reporte generado: ' + fecha;
+                                        },
+                                    },
+                                ]
+                        },
+                        topEnd2: 'search',
+                        initComplete: function () {
+                            //aplicar estilos a la tabla
+                            $('.table').addClass('w-100');
+                        }
                     }
                 });
             }

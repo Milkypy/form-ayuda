@@ -19,7 +19,8 @@ const autoCompletejs = new autoComplete({
             }).then(res => {
                 // console.log(res.data);
                 if (typeof res.data === 'string') return [res.data];
-                arr = res.data.map(item => `📄 Folio ${item.folio_id} - ${item.calle} - #${item.num_calle} (${item.sector})`);
+                arr = res.data.map(item => `📄 Folio ${item.folio_id} - ${item.calle} - #${item.num_calle} (${item.sector}) - Estado:
+                ${item.estado} - fecha de ingreso: ${moment(item.fecha_ingreso, 'YYYY-MM-DD').format('dddd, D [de] MMMM, YYYY. [a las] HH:mm[hrs]')}`);
                 // console.log(arr);
                 return arr;
             }).catch(err => {
@@ -52,9 +53,39 @@ const autoCompletejs = new autoComplete({
                 // Append message element to the results list
                 list.prepend(message);
 
+            } else {
+                //crea un elemento para cada resultado de la lista
+
+
+                //agrega un evento onclick a cada elemento de la lista para mostrar un modal con la información
+                data.results.forEach(result => {
+                    const resultItem = document.createElement('div');
+                    resultItem.classList.add('autoComplete_result');
+                    console.log(result.value);
+                    resultItem.innerHTML = result.value.display;
+                    resultItem.addEventListener('click', () => {
+                        showModal(result.value.data);
+                    });
+                    list.appendChild(resultItem);
+                });
             }
         },
         noResults: true,
         maxResults: 20,
     }
 });
+
+function showModal(data) {
+    console.log(data);
+    const modalBody = document.getElementById('modal-body');
+    modalBody.innerHTML = `
+        <p>Folio: ${data.folio_id}</p>
+        <p>Calle: ${data.calle}</p>
+        <p>Número: ${data.num_calle}</p>
+        <p>Sector: ${data.sector}</p>
+        <p>Estado: ${data.estado}</p>
+        <p>Fecha de ingreso: ${moment(data.fecha_ingreso, 'YYYY-MM-DD').format('dddd, D [de] MMMM, YYYY. [a las] HH:mm[hrs]')}</p>
+    `;
+    const infoModal = new bootstrap.Modal(document.getElementById('infoModal'));
+    infoModal.show();
+}
